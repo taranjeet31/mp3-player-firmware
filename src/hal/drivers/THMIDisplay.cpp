@@ -6,9 +6,9 @@
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_vendor.h"
-#include "soc/soc_memory_types.h"
 #include "init_code.h"
 #include "lvgl.h"
+#include "soc/soc_memory_types.h"
 #include <Arduino.h>
 #include <SPI.h>
 #include <freertos/FreeRTOS.h>
@@ -25,8 +25,7 @@
 
 // Centralized LVGL buffer constants
 static constexpr size_t LVGL_BUFFER_LINES = 32;
-static constexpr size_t LVGL_BUFFER_PIXELS =
-    LCD_H_RES * LVGL_BUFFER_LINES;
+static constexpr size_t LVGL_BUFFER_PIXELS = LCD_H_RES * LVGL_BUFFER_LINES;
 static constexpr size_t LVGL_BUFFER_BYTES =
     LVGL_BUFFER_PIXELS * sizeof(lv_color_t);
 
@@ -110,7 +109,8 @@ void THMIDisplay::lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area,
   int32_t width = area->x2 - area->x1 + 1;
   int32_t height = area->y2 - area->y1 + 1;
 
-  if (area->x1 < 0 || area->x2 >= LCD_H_RES || area->y1 < 0 || area->y2 >= LCD_V_RES || area->x1 > area->x2 || area->y1 > area->y2) {
+  if (area->x1 < 0 || area->x2 >= LCD_H_RES || area->y1 < 0 ||
+      area->y2 >= LCD_V_RES || area->x1 > area->x2 || area->y1 > area->y2) {
     flushRejectedBounds++;
     lv_disp_flush_ready(drv);
     return;
@@ -129,20 +129,24 @@ void THMIDisplay::lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area,
     return;
   }
 
-  // Validate that color_map points to our allocated DMA buffers
+  // Validate that color_map points to our allocated DMA buffers (full submitted region)
   bool is_valid_ptr = false;
-  if (p_buf1 != nullptr && color_map >= p_buf1 && color_map < (p_buf1 + LVGL_BUFFER_PIXELS)) {
+  if (p_buf1 != nullptr && color_map >= p_buf1 &&
+      (color_map + submitted_pixels) <= (p_buf1 + LVGL_BUFFER_PIXELS)) {
     is_valid_ptr = true;
   }
-#if !defined(LVGL_SINGLE_BUFFER_DIAGNOSTIC) || (LVGL_SINGLE_BUFFER_DIAGNOSTIC == 0)
-  if (p_buf2 != nullptr && color_map >= p_buf2 && color_map < (p_buf2 + LVGL_BUFFER_PIXELS)) {
+#if !defined(LVGL_SINGLE_BUFFER_DIAGNOSTIC) ||                                 \
+    (LVGL_SINGLE_BUFFER_DIAGNOSTIC == 0)
+  if (p_buf2 != nullptr && color_map >= p_buf2 &&
+      (color_map + submitted_pixels) <= (p_buf2 + LVGL_BUFFER_PIXELS)) {
     is_valid_ptr = true;
   }
 #endif
 
   if (!is_valid_ptr) {
-    logPrintf("[Display] Rejecting non-buffer color_map pointer: %p (buf1=%p, buf2=%p)\n",
-              (void*)color_map, (void*)p_buf1, (void*)p_buf2);
+    logPrintf("[Display] Rejecting non-buffer color_map pointer: %p (submitted_pixels=%u, buf1=%p-%p, buf2=%p-%p)\n",
+              (void *)color_map, submitted_pixels, (void *)p_buf1, (void *)(p_buf1 ? p_buf1 + LVGL_BUFFER_PIXELS : nullptr),
+              (void *)p_buf2, (void *)(p_buf2 ? p_buf2 + LVGL_BUFFER_PIXELS : nullptr));
     flushRejectedBounds++;
     lv_disp_flush_ready(drv);
     return;
@@ -150,6 +154,22 @@ void THMIDisplay::lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area,
 
   if (submitted_pixels > largestFlushPixels) {
     largestFlushPixels = submitted_pixels;
+  }
+
+  // Rate-limited log for first 10 flushes
+  static uint32_t flushLogCount = 0;
+  bool should_log = false;
+  if (flushLogCount < 10) {
+    flushLogCount++;
+    should_log = true;
+    logPrintf("[Flush Log %u] area=(%d,%d) to (%d,%d) w=%d h=%d pixels=%u color_map=%p\n",
+              (unsigned int)flushLogCount,
+              area->x1, area->y1, area->x2, area->y2,
+              width, height, submitted_pixels, (void*)color_map);
+    logPrintf("[Flush Log %u] buffer start/end: buf1=%p-%p, buf2=%p-%p\n",
+              (unsigned int)flushLogCount,
+              (void*)p_buf1, (void*)(p_buf1 + LVGL_BUFFER_PIXELS),
+              (void*)p_buf2, (void*)(p_buf2 ? p_buf2 + LVGL_BUFFER_PIXELS : nullptr));
   }
 
   // 2. Clear any stale task notification states.
@@ -160,6 +180,10 @@ void THMIDisplay::lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area,
   esp_err_t err = esp_lcd_panel_draw_bitmap(
       panel, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_map);
 
+  if (should_log) {
+    logPrintf("[Flush Log %u] draw call result=%s\n", (unsigned int)flushLogCount, esp_err_to_name(err));
+  }
+
   if (err != ESP_OK) {
     logPrintf("[Display] LCD bitmap submission failed: %s\n",
               esp_err_to_name(err));
@@ -169,6 +193,10 @@ void THMIDisplay::lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area,
 
   // 4. Wait for one DMA completion notification from the ISR.
   uint32_t notified = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
+
+  if (should_log) {
+    logPrintf("[Flush Log %u] DMA completion result notified=%u\n", (unsigned int)flushLogCount, notified);
+  }
 
   if (notified == 0) {
     logPrintln("[Display] LCD transfer timeout");
@@ -198,21 +226,30 @@ void THMIDisplay::lvgl_touch_read(lv_indev_drv_t *indev_driver,
   touchReadCounter++;
   touchReadCount++;
 
-  // 2. Return immediately when no touch is detected.
-  if (digitalRead(TOUCH_IRQ_PIN) == HIGH) {
-    return;
+  // 1.5. Diagnostic logging (runs every 500ms regardless of touch state)
+  static uint32_t lastDiagMs = 0;
+  uint32_t nowMs = millis();
+  if (nowMs - lastDiagMs >= 500) {
+    lastDiagMs = nowMs;
+    Serial.printf("[Touch Diag] irq_pin_level=%d\n", digitalRead(TOUCH_IRQ_PIN));
   }
 
-  // 3. Require valid pressure before reporting pressed.
+  // 2. Return immediately when no touch is detected.
   if (!touch.pressed()) {
     touchRejectedPressureCount++;
     return;
   }
 
-  // 4. Reject raw coordinates outside calibration bounds.
+  // Log raw coordinates immediately upon registered press
   uint16_t rx = touch.RawX();
   uint16_t ry = touch.RawY();
+  static uint32_t lastRawLogMs = 0;
+  if (nowMs - lastRawLogMs >= 200) {
+    lastRawLogMs = nowMs;
+    Serial.printf("[Touch Press] raw_x=%u raw_y=%u\n", rx, ry);
+  }
 
+  // 4. Reject raw coordinates outside calibration bounds.
   uint16_t min_x = 285;
   uint16_t max_x = 1788;
   uint16_t min_y = 311;
@@ -224,13 +261,29 @@ void THMIDisplay::lvgl_touch_read(lv_indev_drv_t *indev_driver,
   }
 
   // 5. Clamp final coordinates to 0..239 and 0..319.
-  int16_t tx = touch.X();
-  int16_t ty = touch.Y();
+  // int16_t tx = touch.X();
+  // int16_t ty = touch.Y();
 
-  if (tx < 0) tx = 0;
-  if (tx > 239) tx = 239;
-  if (ty < 0) ty = 0;
-  if (ty > 319) ty = 319;
+  static constexpr int32_t TOUCH_RAW_X_MIN = 285;
+  static constexpr int32_t TOUCH_RAW_X_MAX = 1788;
+  static constexpr int32_t TOUCH_RAW_Y_MIN = 311;
+  static constexpr int32_t TOUCH_RAW_Y_MAX = 1877;
+
+  int32_t mappedX = map(rx, TOUCH_RAW_X_MIN, TOUCH_RAW_X_MAX, 0, LCD_H_RES - 1);
+
+  int32_t mappedY = map(ry, TOUCH_RAW_Y_MIN, TOUCH_RAW_Y_MAX, 0, LCD_V_RES - 1);
+
+  int16_t tx = constrain(mappedX, 0, LCD_H_RES - 1);
+  int16_t ty = constrain(mappedY, 0, LCD_V_RES - 1);
+
+  if (tx < 0)
+    tx = 0;
+  if (tx > 239)
+    tx = 239;
+  if (ty < 0)
+    ty = 0;
+  if (ty > 319)
+    ty = 319;
 
   // Preserve the last valid coordinates for release reporting.
   last_valid_x = tx;
@@ -239,6 +292,27 @@ void THMIDisplay::lvgl_touch_read(lv_indev_drv_t *indev_driver,
   // 6. Do not report pressed using stale coordinates.
   data->point.x = tx;
   data->point.y = ty;
+
+  static uint32_t lastTouchLogMs = 0;
+uint32_t now = millis();
+
+if (now - lastTouchLogMs >= 200) {
+    lastTouchLogMs = now;
+
+    logPrintf(
+        "[Touch] raw=%u,%u mapped=%d,%d irq=%d\n",
+        static_cast<unsigned>(rx),
+        static_cast<unsigned>(ry),
+        static_cast<int>(tx),
+        static_cast<int>(ty),
+        digitalRead(TOUCH_IRQ_PIN)
+    );
+}
+
+
+
+
+
   data->state = LV_INDEV_STATE_PR;
 
   touchPressedCount++;
@@ -259,39 +333,36 @@ bool THMIDisplay::init() {
 
   delay(200);
 
-  // 3. Initialize touchscreen controller.
-  // Serial.println("[Display] Initializing SPI for Touchscreen...");
-  // SPI.begin(TOUCH_SCLK_PIN, TOUCH_MISO_PIN, TOUCH_MOSI_PIN);
-  // touch.begin(LCD_H_RES, LCD_V_RES);
-  // touch.setCal(1788, 285, 1877, 311, LCD_H_RES, LCD_V_RES);
-  // touch.setRotation(0);
-
-  Serial.printf("[Display] LVGL buffer: %u pixels, %u bytes\n", (unsigned int)LVGL_BUFFER_PIXELS, (unsigned int)LVGL_BUFFER_BYTES);
-  Serial.printf("[Display] I80 max transfer: %u bytes\n", (unsigned int)(LVGL_BUFFER_BYTES + 64));
+  Serial.printf("[Display] LVGL buffer: %u pixels, %u bytes\n",
+                (unsigned int)LVGL_BUFFER_PIXELS,
+                (unsigned int)LVGL_BUFFER_BYTES);
+  Serial.printf("[Display] I80 max transfer: %u bytes\n",
+                (unsigned int)(LVGL_BUFFER_BYTES + 64));
 
   Serial.println("[Display] Initializing Intel 8080 LCD Bus...");
-  esp_lcd_i80_bus_config_t bus_config = {
-      .dc_gpio_num = LCD_DC_PIN,
-      .wr_gpio_num = LCD_PCLK_PIN,
-      .data_gpio_nums =
-          {
-              LCD_D0_PIN,
-              LCD_D1_PIN,
-              LCD_D2_PIN,
-              LCD_D3_PIN,
-              LCD_D4_PIN,
-              LCD_D5_PIN,
-              LCD_D6_PIN,
-              LCD_D7_PIN,
-          },
-      .bus_width = 8,
-      .max_transfer_bytes = LVGL_BUFFER_BYTES + 64};
+  esp_lcd_i80_bus_config_t bus_config = {.dc_gpio_num = LCD_DC_PIN,
+                                         .wr_gpio_num = LCD_PCLK_PIN,
+                                         .data_gpio_nums =
+                                             {
+                                                 LCD_D0_PIN,
+                                                 LCD_D1_PIN,
+                                                 LCD_D2_PIN,
+                                                 LCD_D3_PIN,
+                                                 LCD_D4_PIN,
+                                                 LCD_D5_PIN,
+                                                 LCD_D6_PIN,
+                                                 LCD_D7_PIN,
+                                             },
+                                         .bus_width = 8,
+                                         .max_transfer_bytes =
+                                             LVGL_BUFFER_BYTES + 64};
   esp_err_t err = esp_lcd_new_i80_bus(&bus_config, &i80_bus);
   if (err != ESP_OK) {
     Serial.printf("[Display] Failed to create I80 bus: %s\n",
                   esp_err_to_name(err));
     return false;
   }
+  Serial.println("[Display] I80 bus created");
 
   esp_lcd_panel_io_i80_config_t io_config = {
       .cs_gpio_num = LCD_CS_PIN,
@@ -318,6 +389,7 @@ bool THMIDisplay::init() {
                   esp_err_to_name(err));
     return false;
   }
+  Serial.println("[Display] Panel IO created");
 
   Serial.println("[Display] Installing ST7789 display driver...");
   esp_lcd_panel_dev_config_t panel_config = {
@@ -331,6 +403,7 @@ bool THMIDisplay::init() {
                   esp_err_to_name(err));
     return false;
   }
+  Serial.println("[Display] Panel created");
 
   // Send LilyGO custom ST7789 register initialization sequence (Approach B).
   Serial.println("[Display] Running LilyGO ST7789 custom initialization...");
@@ -346,16 +419,19 @@ bool THMIDisplay::init() {
       delay(st_init_cmds[i].delay);
     }
   }
-  Serial.println("[Display] LilyGO ST7789 custom initialization complete.");
+  Serial.println("[Display] Panel initialized");
 
   Serial.println("[Display] Initializing LVGL Library...");
   lv_init();
+  Serial.println("[Display] LVGL initialized");
 
-  // 1. Allocate partial draw buffers explicitly from internal SRAM with DMA capability
+  // 1. Allocate partial draw buffers explicitly from internal SRAM with DMA
+  // capability
   lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(
       LVGL_BUFFER_BYTES, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
   if (!buf1 || !esp_ptr_dma_capable(buf1)) {
-    Serial.println("[Display] Error: buf1 allocation failed or not DMA capable!");
+    Serial.println(
+        "[Display] Error: buf1 allocation failed or not DMA capable!");
     return false;
   }
   p_buf1 = buf1;
@@ -363,25 +439,18 @@ bool THMIDisplay::init() {
 #if defined(LVGL_SINGLE_BUFFER_DIAGNOSTIC) && LVGL_SINGLE_BUFFER_DIAGNOSTIC
   lv_color_t *buf2 = nullptr;
   p_buf2 = nullptr;
-  Serial.printf("[Display] Allocated single %u-pixel buffer in internal SRAM "
-                "(Free Internal Heap: %d bytes, Free PSRAM: %d bytes)\n",
-                (unsigned int)LVGL_BUFFER_PIXELS,
-                (int)heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
-                (int)heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 #else
   lv_color_t *buf2 = (lv_color_t *)heap_caps_malloc(
       LVGL_BUFFER_BYTES, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
   if (!buf2 || !esp_ptr_dma_capable(buf2)) {
-    Serial.println("[Display] Error: buf2 allocation failed or not DMA capable!");
+    Serial.println(
+        "[Display] Error: buf2 allocation failed or not DMA capable!");
     return false;
   }
   p_buf2 = buf2;
-  Serial.printf("[Display] Allocated two %u-pixel buffers in internal SRAM "
-                "(Free Internal Heap: %d bytes, Free PSRAM: %d bytes)\n",
-                (unsigned int)LVGL_BUFFER_PIXELS,
-                (int)heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
-                (int)heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 #endif
+
+  Serial.println("[Display] Buffer allocated");
 
   static lv_disp_draw_buf_t disp_buf;
   lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LVGL_BUFFER_PIXELS);
@@ -390,7 +459,8 @@ bool THMIDisplay::init() {
   lvglTaskHandle = nullptr;
   lcdFaulted = false;
 
-  // 3. Register the LCD DMA completion callback before registering display driver.
+  // 3. Register the LCD DMA completion callback before registering display
+  // driver.
   esp_lcd_panel_io_callbacks_t ioCallbacks = {.on_color_trans_done =
                                                   notify_dma_done};
   err = esp_lcd_panel_io_register_event_callbacks(io_handle, &ioCallbacks,
@@ -411,15 +481,37 @@ bool THMIDisplay::init() {
   disp_drv.draw_buf = &disp_buf;
   disp_drv.user_data = panel_handle;
   lv_disp_drv_register(&disp_drv);
+  Serial.println("[Display] LVGL display registered");
 
+  // 5. Initialize Touchscreen or keep it disabled based on config.
+#if defined(ENABLE_TOUCH_INPUT) && ENABLE_TOUCH_INPUT
+  Serial.println("[Display] Touch init start");
 
-  // 5. Initialize Touchscreen IRQ pin and register input driver
+  // Ensure all SPI devices are deselected before starting the bus.
+  pinMode(TOUCH_CS_PIN, OUTPUT);
+  digitalWrite(TOUCH_CS_PIN, HIGH);
+
   pinMode(TOUCH_IRQ_PIN, INPUT_PULLUP);
+
+  // Pass -1 to SPI.begin to keep CS pin under standard GPIO control.
+  SPI.begin(TOUCH_SCLK_PIN, TOUCH_MISO_PIN, TOUCH_MOSI_PIN, -1);
+
+  touch.begin(LCD_H_RES, LCD_V_RES);
+  touch.setCal(1788, 285, 1877, 311, LCD_H_RES, LCD_V_RES);
+  touch.setRotation(0);
+
+  Serial.println("[Display] Touch init complete");
+
   static lv_indev_drv_t indev_drv;
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.read_cb = lvgl_touch_read;
   lv_indev_drv_register(&indev_drv);
+  Serial.println("[Display] LVGL input registered");
+#else
+  Serial.println("[Display] Touch init disabled");
+  Serial.println("[Display] LVGL input disabled");
+#endif
 
   Serial.println("[Display] LVGL Initialization complete.");
   return true;

@@ -1,20 +1,41 @@
+#include "Logging.h"
 #include "config.h"
 #include "core/PlaybackManager.h"
 #include "hal/HAL.h"
-#include "Logging.h"
 #include <Arduino.h>
 #include <SD_MMC.h>
 #if defined(TARGET_THMI)
 #include "core/PlayerUI.h"
 #include "hal/drivers/THMIDisplay.h"
-PlayerUI *playerUI = nullptr;
+// PlayerUI *playerUI = nullptr;
 #elif defined(TARGET_S3MINI)
 #include "core/OLEDUI.h"
 OLEDUI *oledUI = nullptr;
 #endif
 
+// #if defined(TARGET_THMI)
+// #include "core/WifiManager.h"
+// WifiManager* wifiManager = nullptr;
+#if defined(TARGET_THMI)
+#include "core/PlayerUI.h"
+#include "core/WifiManager.h"
+#include "hal/drivers/THMIDisplay.h"
+
+PlayerUI *playerUI = nullptr;
+WifiManager *wifiManager = nullptr;
+#endif
+// #endif
+
 PlaybackManager *playbackManager = nullptr;
 SemaphoreHandle_t xGuiSemaphore = nullptr;
+
+// #if defined(TARGET_THMI)
+// wifiManager = new WifiManager();
+
+// if (!wifiManager->init()) {
+//     logPrintln("[Main] WiFi manager initialization failed.");
+// }
+// #endif
 
 // FreeRTOS Task handles
 TaskHandle_t audioTaskHandle = nullptr;
@@ -43,41 +64,42 @@ volatile uint32_t flushRejectedBounds = 0;
 volatile uint32_t flushRejectedOversize = 0;
 volatile uint32_t largestFlushPixels = 0;
 
-void audioTask(void* pvParameters) {
-    logPrintf("[Task] Audio Task started on Core %d\n", xPortGetCoreID());
+void audioTask(void *pvParameters) {
+  logPrintf("[Task] Audio Task started on Core %d\n", xPortGetCoreID());
 
-    while (true) {
-        // Service the decoder first.
-        HAL::get().getAudio()->loop();
+  while (true) {
+    // Service the decoder first.
+    HAL::get().getAudio()->loop();
 
-        if (playbackManager != nullptr) {
-            playbackManager->update();
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(1));
+    if (playbackManager != nullptr) {
+      playbackManager->update();
     }
+
+    vTaskDelay(pdMS_TO_TICKS(1));
+  }
 }
 
 // UI rendering task (Core 1)
 void uiTask(void *pvParameters) {
   logPrintln("[Task] UI Task started on Core 1");
 
-  #if defined(TARGET_THMI)
-  auto* display = static_cast<THMIDisplay*>(HAL::get().getDisplay());
+#if defined(TARGET_THMI)
+  auto *display = static_cast<THMIDisplay *>(HAL::get().getDisplay());
   if (display) {
     display->setLvglTaskHandle(xTaskGetCurrentTaskHandle());
   }
-  #endif
+#endif
 
   while (true) {
     uiLoopCounter++;
     lastUITickMs = millis();
     if (xGuiSemaphore &&
         xSemaphoreTake(xGuiSemaphore, portMAX_DELAY) == pdTRUE) {
-      
+
       HAL::get().getDisplay()->update();
 
-#if !defined(DISABLE_PLAYER_UI_UPDATE_DIAGNOSTIC) || (DISABLE_PLAYER_UI_UPDATE_DIAGNOSTIC == 0)
+#if !defined(DISABLE_PLAYER_UI_UPDATE_DIAGNOSTIC) ||                           \
+    (DISABLE_PLAYER_UI_UPDATE_DIAGNOSTIC == 0)
       // PlayerUI::update() is rate-limited to once per 1000 ms.
       // The LVGL handler above (touch / render) still runs every ~30 ms.
       static uint32_t lastPlayerUiUpdateMs = 0;
@@ -119,7 +141,7 @@ void logHeap(const char *stage) {
 void setup() {
   Serial.begin(115200);
   delay(1000);
-  initLogging();  // Must come before any concurrent task is created.
+  initLogging(); // Must come before any concurrent task is created.
   Serial.println("\n==================================");
   Serial.println("  ESP32-S3 MP3 Player Starting...");
   Serial.println("==================================");
@@ -161,40 +183,83 @@ void setup() {
   logHeap("Post HAL Init");
 
   // Create PlaybackManager & UI
+  // Serial.println("[Main] Initializing Core Managers...");
+  // playbackManager = new PlaybackManager(HAL::get().getAudio());
+  // playbackManager->init();
+
   Serial.println("[Main] Initializing Core Managers...");
+
   playbackManager = new PlaybackManager(HAL::get().getAudio());
+
+  if (playbackManager == nullptr) {
+    logPrintln("[Main] FATAL: PlaybackManager allocation failed.");
+    return;
+  }
+
   playbackManager->init();
 
 #if defined(TARGET_THMI)
-  playerUI = new PlayerUI(*playbackManager);
+
+  wifiManager = new WifiManager();
+
+  if (wifiManager == nullptr) {
+    logPrintln("[Main] FATAL: WifiManager allocation failed.");
+    return;
+  }
+
+  if (!wifiManager->init()) {
+    logPrintln("[Main] WiFi manager initialization failed.");
+  }
+
+  playerUI = new PlayerUI(*playbackManager, *wifiManager);
+
+  if (playerUI == nullptr) {
+    logPrintln("[Main] FATAL: PlayerUI allocation failed.");
+    return;
+  }
+
   playerUI->init();
+
 #elif defined(TARGET_S3MINI)
+
   oledUI = new OLEDUI(*playbackManager);
-  oledUI->init();
+
+  if (oledUI != nullptr) {
+    oledUI->init();
+  }
+
 #endif
+
   logHeap("Post UI Init");
 
-  // Start FreeRTOS Tasks pinned to different cores
-  // Audio task gets priority 2 on Core 0
-  xTaskCreatePinnedToCore(
-      audioTask, "AudioTask",
-      49152, // Prevent stack overflow in AAC decoder
-      NULL, 2, &audioTaskHandle,
-      0 // Core 0
-  );
+  // Start audio service task.
+  BaseType_t audioTaskResult = xTaskCreatePinnedToCore(
+      audioTask, "AudioTask", 49152, nullptr, 2, &audioTaskHandle, 0);
 
-#if defined(DISABLE_PLAYER_UI_UPDATE_DIAGNOSTIC) && DISABLE_PLAYER_UI_UPDATE_DIAGNOSTIC
+  if (audioTaskResult != pdPASS) {
+    logPrintln("[Main] ERROR: Failed to create AudioTask.");
+  } else {
+    logPrintln("[Main] Audio task created");
+  }
+
+#if defined(DISABLE_PLAYER_UI_UPDATE_DIAGNOSTIC) &&                            \
+    DISABLE_PLAYER_UI_UPDATE_DIAGNOSTIC
   logPrintln("[Diagnostic] PlayerUI updates disabled.");
 #endif
 
 #if !defined(DISABLE_UI_TASK_DIAGNOSTIC) || (DISABLE_UI_TASK_DIAGNOSTIC == 0)
   // UI task gets lower priority (2) on Core 1
-  xTaskCreatePinnedToCore(
+  BaseType_t uiTaskResult = xTaskCreatePinnedToCore(
       uiTask, "UITask",
       32768, // Support complex UI render paths safely
       NULL, 2, &uiTaskHandle,
       1 // Core 1
   );
+  if (uiTaskResult != pdPASS) {
+    logPrintln("[Main] ERROR: Failed to create UITask.");
+  } else {
+    logPrintln("[Main] UI task created");
+  }
 #else
   logPrintln("[Diagnostic] UI task disabled.");
 #endif
@@ -208,43 +273,51 @@ void setup() {
 }
 
 void loop() {
-    static uint32_t lastHealthLog = 0;
-    const uint32_t now = millis();
+  static uint32_t lastHealthLog = 0;
+  const uint32_t now = millis();
 
-    if (now - lastHealthLog >= 1000) {
-        lastHealthLog = now;
-        uint32_t returnAgo = now - lastAudioLoopReturnMs;
-        bool playing = false;
-        if (playbackManager) {
-            playing = playbackManager->isPlaying();
-        }
-        bool uiAlive = false;
-#if !defined(DISABLE_UI_TASK_DIAGNOSTIC) || (DISABLE_UI_TASK_DIAGNOSTIC == 0)
-        uiAlive = (now - lastUITickMs < 2000);
-#endif
-        logPrintf("[Health] audioLoops=%u lastReturnAgo=%ums playing=%d uiAlive=%d\n",
-                  (unsigned int)audioLoopIterations, (unsigned int)returnAgo, playing ? 1 : 0, uiAlive ? 1 : 0);
-
-        logPrintf("[FlushHealth] rejectedBounds=%u rejectedOversize=%u largest=%u\n",
-                  (unsigned int)flushRejectedBounds, (unsigned int)flushRejectedOversize,
-                  (unsigned int)largestFlushPixels);
-
-        logPrintf("[UIHealth] loops=%u lvgl=%u/%u player=%u/%u flush=%u/%u touch=%u\n",
-                  (unsigned int)uiLoopCounter,
-                  (unsigned int)lvglHandlerEnterCounter, (unsigned int)lvglHandlerExitCounter,
-                  (unsigned int)playerUiEnterCounter, (unsigned int)playerUiExitCounter,
-                  (unsigned int)lcdFlushSubmitCounter, (unsigned int)lcdFlushCompleteCounter,
-                  (unsigned int)touchReadCounter);
-
-        lv_mem_monitor_t mon;
-        lv_mem_monitor(&mon);
-        logPrintf("[LVGL Mem] free=%u used=%u frag=%u%%\n",
-                  (unsigned int)mon.free_size, (unsigned int)(128U * 1024U - mon.free_size), (unsigned int)mon.frag_pct);
-
-        logPrintf("[TouchHealth] read=%u pressed=%u rejectedPressure=%u rejectedBounds=%u\n",
-                  (unsigned int)touchReadCount, (unsigned int)touchPressedCount,
-                  (unsigned int)touchRejectedPressureCount, (unsigned int)touchRejectedBoundsCount);
+  if (now - lastHealthLog >= 1000) {
+    lastHealthLog = now;
+    uint32_t returnAgo = now - lastAudioLoopReturnMs;
+    bool playing = false;
+    if (playbackManager) {
+      playing = playbackManager->isPlaying();
     }
+    bool uiAlive = false;
+#if !defined(DISABLE_UI_TASK_DIAGNOSTIC) || (DISABLE_UI_TASK_DIAGNOSTIC == 0)
+    uiAlive = (now - lastUITickMs < 2000);
+#endif
+    logPrintf(
+        "[Health] audioLoops=%u lastReturnAgo=%ums playing=%d uiAlive=%d\n",
+        (unsigned int)audioLoopIterations, (unsigned int)returnAgo,
+        playing ? 1 : 0, uiAlive ? 1 : 0);
 
-    delay(100);
+    logPrintf(
+        "[FlushHealth] rejectedBounds=%u rejectedOversize=%u largest=%u\n",
+        (unsigned int)flushRejectedBounds, (unsigned int)flushRejectedOversize,
+        (unsigned int)largestFlushPixels);
+
+    logPrintf(
+        "[UIHealth] loops=%u lvgl=%u/%u player=%u/%u flush=%u/%u touch=%u\n",
+        (unsigned int)uiLoopCounter, (unsigned int)lvglHandlerEnterCounter,
+        (unsigned int)lvglHandlerExitCounter,
+        (unsigned int)playerUiEnterCounter, (unsigned int)playerUiExitCounter,
+        (unsigned int)lcdFlushSubmitCounter,
+        (unsigned int)lcdFlushCompleteCounter, (unsigned int)touchReadCounter);
+
+    lv_mem_monitor_t mon;
+    lv_mem_monitor(&mon);
+    logPrintf("[LVGL Mem] free=%u used=%u frag=%u%%\n",
+              (unsigned int)mon.free_size,
+              (unsigned int)(128U * 1024U - mon.free_size),
+              (unsigned int)mon.frag_pct);
+
+    logPrintf("[TouchHealth] read=%u pressed=%u rejectedPressure=%u "
+              "rejectedBounds=%u\n",
+              (unsigned int)touchReadCount, (unsigned int)touchPressedCount,
+              (unsigned int)touchRejectedPressureCount,
+              (unsigned int)touchRejectedBoundsCount);
+  }
+
+  delay(100);
 }
