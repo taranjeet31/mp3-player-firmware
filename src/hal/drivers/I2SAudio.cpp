@@ -2,6 +2,7 @@
 #include "Logging.h"
 #include "config.h"
 #include <SD_MMC.h>
+#include <driver/i2s.h>
 
 extern volatile uint32_t audioLoopIterations;
 extern volatile uint32_t lastAudioLoopReturnMs;
@@ -264,4 +265,16 @@ void audio_icydescription(const char *info) {
 
 void audio_lasthost(const char *info) {
     logPrintf("[Audio Last Host] %s\n", info);
+}
+
+void I2SAudio::activate() {
+    logPrintln("[I2SAudio] Activating I2S audio output...");
+    audio.setPinout(I2S_BCLK_PIN, I2S_LRC_PIN, I2S_DOUT_PIN);
+    audio.setVolume(volume);
+}
+
+void I2SAudio::deactivate() {
+    logPrintln("[I2SAudio] Deactivating I2S audio output...");
+    audio.stopSong();
+    i2s_driver_uninstall(I2S_NUM_0);
 }

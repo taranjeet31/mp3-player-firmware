@@ -1,15 +1,22 @@
 #pragma once
-#include "Playlist.h"
-#include "hal/IAudioOutput.h"
+#include "IAudioSource.h"
+#include "LocalSDSource.h"
+
+enum class AudioSourceType {
+    LOCAL_SD,
+    SPOTIFY
+};
 
 class PlaybackManager {
 private:
-    Playlist playlist;
-    IAudioOutput* audioOut;
-    bool paused;
+    IAudioSource* activeSource;
+    LocalSDSource* localSource;
+    IAudioSource* spotifySource;
+    AudioSourceType currentSourceType;
 
 public:
     PlaybackManager(IAudioOutput* audio);
+    ~PlaybackManager();
     void init();
     void update(); // Periodic tick handler
 
@@ -27,7 +34,12 @@ public:
     bool isPlaying() const;
     
     String getCurrentTrackName() const;
+    String getCurrentArtistName() const;
     uint32_t getTrackDuration() const;
     uint32_t getTrackElapsed() const;
     void seekTo(uint16_t seconds);
+
+    void setSource(AudioSourceType type);
+    AudioSourceType getSource() const;
+    IAudioSource* getActiveSource() const;
 };

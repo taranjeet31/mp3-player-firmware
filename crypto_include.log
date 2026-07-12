@@ -1,0 +1,488 @@
+. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/bt/esp_ble_mesh/mesh_core/Crypto.h
+.. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/string.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/_ansi.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/newlib.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/_newlib_version.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/config.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/ieeefp.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/features.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/sys/reent.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/reent.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/_ansi.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/_types.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/_types.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/_default_types.h
+..... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/sys/lock.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/lock.h
+..... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/assert.h
+...... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_opi/include/sdkconfig.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/stdlib.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cstdlib
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/xtensa-esp32s3-elf/no-rtti/bits/c++config.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/xtensa-esp32s3-elf/no-rtti/bits/os_defines.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/xtensa-esp32s3-elf/no-rtti/bits/cpu_defines.h
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/stdlib.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/ieeefp.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/cdefs.h
+.......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/stdlib.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/alloca.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/_locale.h
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/std_abs.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stdint.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/stdint.h
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/_intsup.h
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/_stdint.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/assert.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/strings.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/string.h
+.. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/bt/esp_ble_mesh/mesh_common/include/mesh_buf.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/bt/esp_ble_mesh/mesh_common/include/mesh_config.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/bt/esp_ble_mesh/mesh_common/include/mesh_types.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stdbool.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/inttypes.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/bt/esp_ble_mesh/mesh_common/include/mesh_slist.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/bt/esp_ble_mesh/mesh_common/include/mesh_util.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+..... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_bit_defs.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/bt/esp_ble_mesh/mesh_common/include/mesh_compiler.h
+. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/base64.h
+.. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/port/include/mbedtls/esp_config.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/config.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/check_config.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include-fixed/limits.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include-fixed/syslimits.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include-fixed/limits.h
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/limits.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/syslimits.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/soc_caps.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/brownout_caps.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/cpu_caps.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/i2c_caps.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/ledc_caps.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/mpu_caps.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/twai_caps.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/port/include/esp_mem.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/stdlib.h
+.. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/port/include/mbedtls/bignum.h
+.. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/bignum.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/stdio.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stdarg.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/types.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/endian.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/_endian.h
+..... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/sys/select.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/types.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/select.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/_sigset.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/_timeval.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/timespec.h
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/_timespec.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/_pthreadtypes.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/sched.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/types.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/stdio.h
+. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h
+.. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/aes.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/platform_util.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/port/include/aes_alt.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/port/include/aes/esp_aes.h
+..... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_types.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+..... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/hal/include/hal/aes_types.h
+. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/entropy.h
+.. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+.. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/sha512.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/port/include/sha512_alt.h
+.... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/hal/include/hal/sha_types.h
+..... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_rom/include/esp32s3/rom/sha.h
+...... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_rom/include/esp32s3/rom/ets_sys.h
+....... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/soc.h
+........ /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_assert.h
+. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/pkcs5.h
+.. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/asn1.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+.. /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/mbedtls/mbedtls/include/mbedtls/md.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+.. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cstdint
+. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/stdexcept
+.. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/exception
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/exception.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/exception_ptr.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/exception_defines.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/cxxabi_init_exception.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/typeinfo
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/hash_bytes.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/new
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/exception
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/nested_exception.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/move.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/concept_check.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/type_traits
+.. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/string
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/stringfwd.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/memoryfwd.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/char_traits.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/stl_algobase.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/functexcept.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/cpp_type_traits.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/ext/type_traits.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/ext/numeric_traits.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/stl_pair.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/stl_iterator_base_types.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/stl_iterator_base_funcs.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/debug/assertions.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/stl_iterator.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/ptr_traits.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/debug/debug.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/predefined_ops.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/postypes.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cwchar
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/wchar.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stdarg.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cwchar
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/allocator.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/xtensa-esp32s3-elf/no-rtti/bits/c++allocator.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/ext/new_allocator.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/localefwd.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/xtensa-esp32s3-elf/no-rtti/bits/c++locale.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/clocale
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/locale.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/iosfwd
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cctype
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/ctype.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/ostream_insert.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/cxxabi_forced.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/stl_function.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/backward/binders.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/range_access.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/initializer_list
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/basic_string.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/ext/atomicity.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/xtensa-esp32s3-elf/no-rtti/bits/gthr.h
+...... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/xtensa-esp32s3-elf/no-rtti/bits/gthr-default.h
+....... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/pthread.h
+........ /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/sys/time.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/time.h
+.......... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/time.h
+........... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/time.h
+............ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+............ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/time.h
+............ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/signal.h
+............. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/signal.h
+.......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/machine/_time.h
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/pthread.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/unistd.h
+.......... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/sys/unistd.h
+........... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/unistd.h
+............ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+......... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sched.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/xtensa-esp32s3-elf/no-rtti/bits/atomic_word.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/ext/alloc_traits.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/alloc_traits.h
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/string_view
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/limits
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/functional_hash.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/string_view.tcc
+.... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/ext/string_conversions.h
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cstdlib
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cwchar
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cstdio
+..... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/cerrno
+...... /Users/taranjeetsingh/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include/errno.h
+....... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/errno.h
+........ /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/sys/errno.h
+... /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/basic_string.tcc
+. lib/cspot/cspot/bell/main/utilities/include/aes.h
+.. /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/lib/gcc/xtensa-esp32s3-elf/8.4.0/include/stddef.h
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:17:1: error: 'CryptoMbedTLS' does not name a type
+ CryptoMbedTLS::CryptoMbedTLS() {}
+ ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:19:1: error: 'CryptoMbedTLS' does not name a type
+ CryptoMbedTLS::~CryptoMbedTLS() {
+ ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:25:6: error: 'vector' in namespace 'std' does not name a template type
+ std::vector<uint8_t> CryptoMbedTLS::base64Decode(const std::string& data) {
+      ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:25:1: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:13:1:
++#include <vector>
+ }
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:25:1:
+ std::vector<uint8_t> CryptoMbedTLS::base64Decode(const std::string& data) {
+ ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:40:13: error: 'CryptoMbedTLS' has not been declared
+ std::string CryptoMbedTLS::base64Encode(const std::vector<uint8_t>& data) {
+             ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:40:52: error: 'vector' in namespace 'std' does not name a template type
+ std::string CryptoMbedTLS::base64Encode(const std::vector<uint8_t>& data) {
+                                                    ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:40:47: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ std::string CryptoMbedTLS::base64Encode(const std::vector<uint8_t>& data) {
+                                               ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:40:58: error: expected ',' or '...' before '<' token
+ std::string CryptoMbedTLS::base64Encode(const std::vector<uint8_t>& data) {
+                                                          ^
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: In function 'std::__cxx11::string base64Encode(int)':
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:43:52: error: 'data' was not declared in this scope
+   mbedtls_base64_encode(nullptr, 0, &requiredSize, data.data(), data.size());
+                                                    ^~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:43:52: note: suggested alternative:
+In file included from /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/string:51,
+                 from /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/stdexcept:39,
+                 from lib/cspot/cspot/bell/main/utilities/Crypto.cpp:9:
+/Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/range_access.h:318:5: note:   'std::data'
+     data(initializer_list<_Tp> __il) noexcept
+     ^~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:45:8: error: 'vector' is not a member of 'std'
+   std::vector<uint8_t> output(requiredSize);
+        ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:45:8: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:45:22: error: expected primary-expression before '>' token
+   std::vector<uint8_t> output(requiredSize);
+                      ^
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:45:24: error: 'output' was not declared in this scope
+   std::vector<uint8_t> output(requiredSize);
+                        ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:45:24: note: suggested alternative: 'optopt'
+   std::vector<uint8_t> output(requiredSize);
+                        ^~~~~~
+                        optopt
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: At global scope:
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:55:6: error: 'CryptoMbedTLS' has not been declared
+ void CryptoMbedTLS::sha1Init() {
+      ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: In function 'void sha1Init()':
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:57:20: error: 'sha1Context' was not declared in this scope
+   mbedtls_md_init(&sha1Context);
+                    ^~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:57:20: note: suggested alternative: 'SHAContext'
+   mbedtls_md_init(&sha1Context);
+                    ^~~~~~~~~~~
+                    SHAContext
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: At global scope:
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:62:6: error: 'CryptoMbedTLS' has not been declared
+ void CryptoMbedTLS::sha1Update(const std::string& s) {
+      ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: In function 'void sha1Update(const string&)':
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:63:19: error: 'vector' is not a member of 'std'
+   sha1Update(std::vector<uint8_t>(s.begin(), s.end()));
+                   ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:63:19: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:63:33: error: expected primary-expression before '>' token
+   sha1Update(std::vector<uint8_t>(s.begin(), s.end()));
+                                 ^
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: At global scope:
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:65:6: error: 'CryptoMbedTLS' has not been declared
+ void CryptoMbedTLS::sha1Update(const std::vector<uint8_t>& vec) {
+      ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:65:43: error: 'vector' in namespace 'std' does not name a template type
+ void CryptoMbedTLS::sha1Update(const std::vector<uint8_t>& vec) {
+                                           ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:65:38: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ void CryptoMbedTLS::sha1Update(const std::vector<uint8_t>& vec) {
+                                      ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:65:49: error: expected ',' or '...' before '<' token
+ void CryptoMbedTLS::sha1Update(const std::vector<uint8_t>& vec) {
+                                                 ^
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: In function 'void sha1Update(int)':
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:66:22: error: 'sha1Context' was not declared in this scope
+   mbedtls_md_update(&sha1Context, vec.data(), vec.size());
+                      ^~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:66:22: note: suggested alternative: 'SHAContext'
+   mbedtls_md_update(&sha1Context, vec.data(), vec.size());
+                      ^~~~~~~~~~~
+                      SHAContext
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:66:35: error: 'vec' was not declared in this scope
+   mbedtls_md_update(&sha1Context, vec.data(), vec.size());
+                                   ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:66:35: note: suggested alternative: 'getc'
+   mbedtls_md_update(&sha1Context, vec.data(), vec.size());
+                                   ^~~
+                                   getc
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: At global scope:
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:69:6: error: 'vector' in namespace 'std' does not name a template type
+ std::vector<uint8_t> CryptoMbedTLS::sha1FinalBytes() {
+      ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:69:1: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ std::vector<uint8_t> CryptoMbedTLS::sha1FinalBytes() {
+ ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:78:13: error: 'CryptoMbedTLS' has not been declared
+ std::string CryptoMbedTLS::sha1Final() {
+             ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: In function 'std::__cxx11::string sha1Final()':
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:79:17: error: 'sha1FinalBytes' was not declared in this scope
+   auto digest = sha1FinalBytes();
+                 ^~~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:79:17: note: suggested alternative: 'sha1Final'
+   auto digest = sha1FinalBytes();
+                 ^~~~~~~~~~~~~~
+                 sha1Final
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: At global scope:
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:84:6: error: 'vector' in namespace 'std' does not name a template type
+ std::vector<uint8_t> CryptoMbedTLS::sha1HMAC(
+      ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:84:1: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ std::vector<uint8_t> CryptoMbedTLS::sha1HMAC(
+ ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:98:6: error: 'CryptoMbedTLS' has not been declared
+ void CryptoMbedTLS::aesCTRXcrypt(const std::vector<uint8_t>& key,
+      ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:98:45: error: 'vector' in namespace 'std' does not name a template type
+ void CryptoMbedTLS::aesCTRXcrypt(const std::vector<uint8_t>& key,
+                                             ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:98:40: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ void CryptoMbedTLS::aesCTRXcrypt(const std::vector<uint8_t>& key,
+                                        ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:98:51: error: expected ',' or '...' before '<' token
+ void CryptoMbedTLS::aesCTRXcrypt(const std::vector<uint8_t>& key,
+                                                   ^
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: In function 'void aesCTRXcrypt(int)':
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:101:8: error: 'aesCtxInitialized' was not declared in this scope
+   if (!aesCtxInitialized) {
+        ^~~~~~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:102:23: error: 'aesCtx' was not declared in this scope
+     mbedtls_aes_init(&aesCtx);
+                       ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:110:31: error: 'aesCtx' was not declared in this scope
+   if (mbedtls_aes_setkey_enc(&aesCtx, key.data(), key.size() * 8) != 0) {
+                               ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:110:39: error: 'key' was not declared in this scope
+   if (mbedtls_aes_setkey_enc(&aesCtx, key.data(), key.size() * 8) != 0) {
+                                       ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:110:39: note: suggested alternative: 'key_t'
+   if (mbedtls_aes_setkey_enc(&aesCtx, key.data(), key.size() * 8) != 0) {
+                                       ^~~
+                                       key_t
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:114:30: error: 'aesCtx' was not declared in this scope
+   if (mbedtls_aes_crypt_ctr(&aesCtx, nbytes, &off, iv.data(), streamBlock,
+                              ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:114:38: error: 'nbytes' was not declared in this scope
+   if (mbedtls_aes_crypt_ctr(&aesCtx, nbytes, &off, iv.data(), streamBlock,
+                                      ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:114:52: error: 'iv' was not declared in this scope
+   if (mbedtls_aes_crypt_ctr(&aesCtx, nbytes, &off, iv.data(), streamBlock,
+                                                    ^~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:114:52: note: suggested alternative: 'div'
+   if (mbedtls_aes_crypt_ctr(&aesCtx, nbytes, &off, iv.data(), streamBlock,
+                                                    ^~
+                                                    div
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:115:29: error: 'buffer' was not declared in this scope
+                             buffer, buffer) != 0) {
+                             ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:115:29: note: suggested alternative: 'setbuffer'
+                             buffer, buffer) != 0) {
+                             ^~~~~~
+                             setbuffer
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: At global scope:
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:120:6: error: 'CryptoMbedTLS' has not been declared
+ void CryptoMbedTLS::aesECBdecrypt(const std::vector<uint8_t>& key,
+      ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:120:46: error: 'vector' in namespace 'std' does not name a template type
+ void CryptoMbedTLS::aesECBdecrypt(const std::vector<uint8_t>& key,
+                                              ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:120:41: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ void CryptoMbedTLS::aesECBdecrypt(const std::vector<uint8_t>& key,
+                                         ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:120:52: error: expected ',' or '...' before '<' token
+ void CryptoMbedTLS::aesECBdecrypt(const std::vector<uint8_t>& key,
+                                                    ^
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: In function 'void aesECBdecrypt(int)':
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:124:25: error: 'key' was not declared in this scope
+   AES_init_ctx(&aesCtr, key.data());
+                         ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:124:25: note: suggested alternative: 'key_t'
+   AES_init_ctx(&aesCtr, key.data());
+                         ^~~
+                         key_t
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:126:32: error: 'data' was not declared in this scope
+   for (unsigned int x = 0; x < data.size() / 16; x++) {
+                                ^~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:126:32: note: suggested alternative:
+In file included from /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/string:51,
+                 from /Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/stdexcept:39,
+                 from lib/cspot/cspot/bell/main/utilities/Crypto.cpp:9:
+/Users/taranjeetsingh/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/include/c++/8.4.0/bits/range_access.h:318:5: note:   'std::data'
+     data(initializer_list<_Tp> __il) noexcept
+     ^~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: At global scope:
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:133:6: error: 'vector' in namespace 'std' does not name a template type
+ std::vector<uint8_t> CryptoMbedTLS::pbkdf2HmacSha1(
+      ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:133:1: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ std::vector<uint8_t> CryptoMbedTLS::pbkdf2HmacSha1(
+ ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:156:6: error: 'CryptoMbedTLS' has not been declared
+ void CryptoMbedTLS::dhInit() {
+      ^~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: In function 'void dhInit()':
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:157:3: error: 'privateKey' was not declared in this scope
+   privateKey = generateVectorWithRandomData(DH_KEY_SIZE);
+   ^~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:157:45: error: 'DH_KEY_SIZE' was not declared in this scope
+   privateKey = generateVectorWithRandomData(DH_KEY_SIZE);
+                                             ^~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:157:45: note: suggested alternative: 'FD_SETSIZE'
+   privateKey = generateVectorWithRandomData(DH_KEY_SIZE);
+                                             ^~~~~~~~~~~
+                                             FD_SETSIZE
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:157:16: error: 'generateVectorWithRandomData' was not declared in this scope
+   privateKey = generateVectorWithRandomData(DH_KEY_SIZE);
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:167:35: error: 'DHPrime' was not declared in this scope
+   mbedtls_mpi_read_binary(&prime, DHPrime, sizeof(DHPrime));
+                                   ^~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:167:35: note: suggested alternative: 'prime'
+   mbedtls_mpi_read_binary(&prime, DHPrime, sizeof(DHPrime));
+                                   ^~~~~~~
+                                   prime
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:175:3: error: invalid use of 'this' in non-member function
+   this->publicKey = std::vector<uint8_t>(DH_KEY_SIZE);
+   ^~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:175:26: error: 'vector' is not a member of 'std'
+   this->publicKey = std::vector<uint8_t>(DH_KEY_SIZE);
+                          ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:175:26: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:175:40: error: expected primary-expression before '>' token
+   this->publicKey = std::vector<uint8_t>(DH_KEY_SIZE);
+                                        ^
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:176:34: error: 'publicKey' was not declared in this scope
+   mbedtls_mpi_write_binary(&res, publicKey.data(), DH_KEY_SIZE);
+                                  ^~~~~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:176:34: note: suggested alternative: 'privKey'
+   mbedtls_mpi_write_binary(&res, publicKey.data(), DH_KEY_SIZE);
+                                  ^~~~~~~~~
+                                  privKey
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp: At global scope:
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:185:6: error: 'vector' in namespace 'std' does not name a template type
+ std::vector<uint8_t> CryptoMbedTLS::dhCalculateShared(
+      ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:185:1: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ std::vector<uint8_t> CryptoMbedTLS::dhCalculateShared(
+ ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:215:6: error: 'vector' in namespace 'std' does not name a template type
+ std::vector<uint8_t> CryptoMbedTLS::generateVectorWithRandomData(
+      ^~~~~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:215:1: note: 'std::vector' is defined in header '<vector>'; did you forget to '#include <vector>'?
+ std::vector<uint8_t> CryptoMbedTLS::generateVectorWithRandomData(
+ ^~~
+lib/cspot/cspot/bell/main/utilities/Crypto.cpp:239:1: fatal error: opening dependency file /dev/null.d: Operation not permitted
+ }
+ ^
+compilation terminated.

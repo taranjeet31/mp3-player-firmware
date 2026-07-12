@@ -3,111 +3,152 @@
 #include "Logging.h"
 #include <Arduino.h>
 
-PlaybackManager::PlaybackManager(IAudioOutput* audio) : audioOut(audio), paused(true) {}
+#if defined(TARGET_THMI)
+#include "core/SpotifySource.h"
+#endif
+
+PlaybackManager::PlaybackManager(IAudioOutput* audio) 
+    : activeSource(nullptr), localSource(nullptr), spotifySource(nullptr), currentSourceType(AudioSourceType::LOCAL_SD) {
+    localSource = new LocalSDSource(audio);
+    activeSource = localSource;
+}
+
+PlaybackManager::~PlaybackManager() {
+    delete localSource;
+#if defined(TARGET_THMI)
+    if (spotifySource) {
+        delete spotifySource;
+    }
+#endif
+}
 
 void PlaybackManager::init() {
-    playlist.scanSD();
-    if (!playlist.isEmpty()) {
-        Serial.printf("[Playback] Found %d tracks. Ready to play.\n", playlist.getTrackCount());
-    } else {
-        Serial.println("[Playback] No tracks available on SD card.");
-    }
+    localSource->activate(); // Start with local SD active by default
+    
+#if defined(TARGET_THMI)
+    // Spotify is lazy-initialized, so we don't allocate SpotifySource yet.
+    // We will allocate it on demand in setSource(AudioSourceType::SPOTIFY).
+#endif
 }
 
 void PlaybackManager::update() {
-    // Check if the current track finished playing automatically
-    // If we are not paused, have a playlist, and the audio driver is not running,
-    // it indicates EOF has been reached.
-    if (!paused && !playlist.isEmpty() && !audioOut->isPlaying()) {
-        Serial.println("[Playback] Current song finished. Auto-playing next track.");
-        next();
+    if (activeSource) {
+        activeSource->loop();
     }
 }
 
 void PlaybackManager::play() {
-    if (playlist.isEmpty()) return;
-    
-    String trackPath = playlist.getCurrentTrackPath();
-    if (trackPath.length() > 0) {
-        Serial.printf("[Playback] Playing track: %s\n", trackPath.c_str());
-        audioOut->playFile(trackPath.c_str());
-        paused = false;
-    }
+    if (activeSource) activeSource->play();
 }
 
 void PlaybackManager::pause() {
-    audioOut->stop();
-    paused = true;
-    Serial.println("[Playback] Paused.");
+    if (activeSource) activeSource->pause();
 }
 
 void PlaybackManager::togglePlayPause() {
-    if (paused) {
-        play();
-    } else {
-        pause();
+    if (activeSource) {
+        if (activeSource->isPlaying()) {
+            activeSource->pause();
+        } else {
+            activeSource->play();
+        }
     }
 }
 
 void PlaybackManager::next() {
-    if (playlist.isEmpty()) return;
-    
-    bool hasNext = playlist.next();
-    if (hasNext || playlist.isRepeat()) {
-        play();
-    } else {
-        // Stopped at the end of the playlist
-        pause();
-    }
+    if (activeSource) activeSource->next();
 }
 
 void PlaybackManager::prev() {
-    if (playlist.isEmpty()) return;
-    
-    playlist.prev();
-    play();
+    if (activeSource) activeSource->prev();
 }
 
 void PlaybackManager::setVolume(uint8_t vol) {
-    audioOut->setVolume(vol);
+    if (activeSource) activeSource->setVolume(vol);
 }
 
 uint8_t PlaybackManager::getVolume() const {
-    return audioOut->getVolume();
+    return activeSource ? activeSource->getVolume() : 0;
 }
 
 Playlist& PlaybackManager::getPlaylist() {
-    return playlist;
+    return localSource->getPlaylist();
 }
 
 bool PlaybackManager::isPaused() const {
-    return paused;
+    return activeSource ? activeSource->isPaused() : true;
 }
 
 bool PlaybackManager::isPlaying() const {
-    return !paused && audioOut->isPlaying();
+    return activeSource ? activeSource->isPlaying() : false;
 }
 
 String PlaybackManager::getCurrentTrackName() const {
-    return playlist.getCurrentTrackName();
+    return activeSource ? activeSource->getTrackName() : "";
+}
+
+String PlaybackManager::getCurrentArtistName() const {
+    return activeSource ? activeSource->getArtistName() : "";
 }
 
 uint32_t PlaybackManager::getTrackDuration() const {
-    return audioOut->getAudioFileDuration();
+    return activeSource ? activeSource->getTrackDuration() : 0;
 }
 
 uint32_t PlaybackManager::getTrackElapsed() const {
-    return audioOut->getAudioCurrentTime();
+    return activeSource ? activeSource->getTrackElapsed() : 0;
 }
 
 void PlaybackManager::seekTo(uint16_t seconds) {
-#if defined(DISABLE_SEEK_DIAGNOSTIC) && DISABLE_SEEK_DIAGNOSTIC
-    logPrintf(
-        "[Playback] Seek ignored in diagnostic mode: %u seconds\n",
-        static_cast<unsigned>(seconds)
-    );
-    return;
+    if (activeSource) activeSource->seekTo(seconds);
+}
+
+void PlaybackManager::setSource(AudioSourceType type) {
+    if (currentSourceType == type) return;
+    
+    logPrintf("[PlaybackManager] Switching source to %s...\n", 
+              type == AudioSourceType::LOCAL_SD ? "Local SD" : "Spotify");
+              
+    if (activeSource) {
+        activeSource->deactivate();
+    }
+    
+    currentSourceType = type;
+    
+    if (type == AudioSourceType::LOCAL_SD) {
+        activeSource = localSource;
+    } else {
+#if defined(TARGET_THMI)
+        if (spotifySource == nullptr) {
+            logPrintln("[PlaybackManager] Lazily instantiating SpotifySource...");
+            Serial.printf("[Heap Log] Pre-Spotify Init - Free Internal: %u bytes, Free PSRAM: %u bytes\n",
+                          heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+                          heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+                          
+            spotifySource = new SpotifySource();
+            
+            Serial.printf("[Heap Log] Post-Spotify Init - Free Internal: %u bytes, Free PSRAM: %u bytes\n",
+                          heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+                          heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+        }
+        activeSource = spotifySource;
 #else
-    audioOut->setAudioPlayPosition(seconds);
+        // Spotify is not supported on other targets, fall back to Local SD
+        activeSource = localSource;
+        currentSourceType = AudioSourceType::LOCAL_SD;
+        logPrintln("[PlaybackManager] Spotify not supported on this board target.");
 #endif
+    }
+    
+    if (activeSource) {
+        activeSource->activate();
+    }
+}
+
+AudioSourceType PlaybackManager::getSource() const {
+    return currentSourceType;
+}
+
+IAudioSource* PlaybackManager::getActiveSource() const {
+    return activeSource;
 }

@@ -41,6 +41,7 @@ private:
 
   // ── UI state cache – only call LVGL setters when value changes ─────────
   String last_track_name;
+  String last_artist_name;
   bool last_is_playing;
   uint8_t last_volume;
   uint32_t last_elapsed;
@@ -59,13 +60,21 @@ private:
   lv_obj_t *wifi_network_list;
   lv_obj_t *wifi_password_area;
   lv_obj_t *wifi_keyboard;
+  lv_obj_t *wifi_disconnect_btn;
+  lv_obj_t *wifi_icon_label;
+
+  std::vector<String> scanned_ssids;
+  std::vector<bool> scanned_secured;
+  String selected_ssid;
+  WifiState last_wifi_state = WifiState::WIFI_DISABLED;
+  int wifi_failed_timer = 0;
 
   void createNowPlayingScreen();
   void createPlaylistScreen();
   void createWifiScreen();
-
   void showScreen(PlayerScreen screen);
   void rebuildPlaylistRows();
+  void rebuildWifiList();
 
   // No seek state, no drag state, no screen-switching state.
 
@@ -84,6 +93,11 @@ public:
   static void open_wifi_cb(lv_event_t *e);
   static void back_to_player_cb(lv_event_t *e);
   static void playlist_track_cb(lv_event_t *e);
+  
+  static void wifi_network_clicked_cb(lv_event_t *e);
+  static void wifi_keyboard_cb(lv_event_t *e);
+  static void wifi_disconnect_cb(lv_event_t *e);
 };
 
 #endif
+

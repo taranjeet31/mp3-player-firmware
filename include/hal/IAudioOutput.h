@@ -14,4 +14,6 @@ public:
     virtual uint32_t getAudioFileDuration() = 0; // in seconds
     virtual uint32_t getAudioCurrentTime() = 0; // in seconds
     virtual void setAudioPlayPosition(uint16_t seconds) = 0;
+    virtual void activate() {}
+    virtual void deactivate() {}
 };

@@ -56,4 +56,6 @@ public:
     uint32_t getAudioFileDuration() override;
     uint32_t getAudioCurrentTime() override;
     void setAudioPlayPosition(uint16_t seconds) override;
+    void activate() override;
+    void deactivate() override;
 };

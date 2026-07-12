@@ -305,12 +305,14 @@ void loop() {
         (unsigned int)lcdFlushSubmitCounter,
         (unsigned int)lcdFlushCompleteCounter, (unsigned int)touchReadCounter);
 
+#if defined(TARGET_THMI)
     lv_mem_monitor_t mon;
     lv_mem_monitor(&mon);
     logPrintf("[LVGL Mem] free=%u used=%u frag=%u%%\n",
               (unsigned int)mon.free_size,
               (unsigned int)(128U * 1024U - mon.free_size),
               (unsigned int)mon.frag_pct);
+#endif
 
     logPrintf("[TouchHealth] read=%u pressed=%u rejectedPressure=%u "
               "rejectedBounds=%u\n",

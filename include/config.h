@@ -32,6 +32,15 @@
 #define LVGL_SINGLE_BUFFER_DIAGNOSTIC 1
 #endif
 
+// Default Wi-Fi Credentials
+#ifndef WIFI_SSID
+#define WIFI_SSID "Wifi-4g"
+#endif
+
+#ifndef WIFI_PASSWORD
+#define WIFI_PASSWORD "Singh@123@"
+#endif
+
 #if defined(TARGET_THMI)
 
 // Power & Backlight Control

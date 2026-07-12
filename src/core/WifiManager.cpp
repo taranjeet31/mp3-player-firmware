@@ -1,6 +1,7 @@
 #if defined(TARGET_THMI)
 
 #include "core/WifiManager.h"
+#include "config.h"
 #include "Logging.h"
 
 WifiManager::WifiManager()
@@ -72,23 +73,29 @@ void WifiManager::processCommand(const WifiCommand &command) {
     break;
 
   case WifiCommandType::CONNECT_SAVED: {
-    // String ssid = preferences.getString("ssid", "");
-    // String password = preferences.getString("password", "");
-
-    if (!preferences.isKey("ssid")) {
-      logPrintln("[WiFi] No saved Wi-Fi credentials.");
-      break;
-    }
-
-    String ssid = preferences.getString("ssid", "");
-
+    String ssid = "";
     String password = "";
 
-    if (preferences.isKey("password")) {
-      password = preferences.getString("password", "");
+    if (preferences.isKey("ssid")) {
+      ssid = preferences.getString("ssid", "");
+      if (preferences.isKey("password")) {
+        password = preferences.getString("password", "");
+      }
+    } else {
+      logPrintln("[WiFi] No saved Wi-Fi credentials found in Preferences.");
+#if defined(WIFI_SSID) && defined(WIFI_PASSWORD)
+      if (strlen(WIFI_SSID) > 0 && strcmp(WIFI_SSID, "Your_SSID") != 0) {
+        logPrintln("[WiFi] Attempting connection to compile-time fallback SSID.");
+        ssid = WIFI_SSID;
+        password = WIFI_PASSWORD;
+      }
+#endif
     }
+
     if (!ssid.isEmpty()) {
       performConnect(ssid.c_str(), password.c_str());
+    } else {
+      logPrintln("[WiFi] No SSID specified. Cannot connect.");
     }
     break;
   }

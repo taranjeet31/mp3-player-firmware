@@ -217,8 +217,19 @@
     lv_obj_center(libraryLabel);
 
     createPlaylistScreen();
+    createWifiScreen();
 
-    // Do not call createWifiScreen() until it is implemented.
+    // WiFi Button
+    lv_obj_t *wifiBtn = lv_btn_create(now_playing_screen);
+    lv_obj_set_size(wifiBtn, 72, 30);
+    lv_obj_align(wifiBtn, LV_ALIGN_TOP_RIGHT, -8, 24);
+    lv_obj_add_style(wifiBtn, &style_btn, 0);
+    lv_obj_add_event_cb(wifiBtn, open_wifi_cb, LV_EVENT_CLICKED, this);
+
+    lv_obj_t *wifiLabel = lv_label_create(wifiBtn);
+    lv_label_set_text(wifiLabel, "WIFI");
+    lv_obj_set_style_text_font(wifiLabel, &lv_font_montserrat_10, 0);
+    lv_obj_center(wifiLabel);
 
     // ── Row 1: Status label (left) + Volume label (right) ─────────────────
     // y = 8 px from top
@@ -235,6 +246,12 @@
     lv_obj_add_style(vol_label, &style_text_muted, 0);
     // Right-align: place after knowing it renders – we use LV_ALIGN
     lv_obj_align(vol_label, LV_ALIGN_TOP_RIGHT, -8, 8);
+
+    wifi_icon_label = lv_label_create(now_playing_screen);
+    lv_label_set_text(wifi_icon_label, LV_SYMBOL_WIFI);
+    lv_obj_set_style_text_font(wifi_icon_label, &lv_font_montserrat_10, 0);
+    lv_obj_add_style(wifi_icon_label, &style_text_muted, 0);
+    lv_obj_align(wifi_icon_label, LV_ALIGN_TOP_RIGHT, -65, 8);
 
     // ── Row 2: Large monogram letter (accent, centre) ──────────────────────
     // y ≈ 35 px
@@ -393,6 +410,26 @@
       break;
 
     case PlayerScreen::WIFI:
+      if (wifi_keyboard) lv_obj_add_flag(wifi_keyboard, LV_OBJ_FLAG_HIDDEN);
+      if (wifi_password_area) lv_obj_add_flag(wifi_password_area, LV_OBJ_FLAG_HIDDEN);
+      
+      if (wifiManager.getState() == WifiState::WIFI_CONNECTED) {
+        if (wifi_status_label) {
+          String text = "Connected to: " + wifiManager.getConnectedSsid();
+          lv_label_set_text(wifi_status_label, text.c_str());
+        }
+        if (wifi_disconnect_btn) lv_obj_clear_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
+        if (wifi_network_list) lv_obj_add_flag(wifi_network_list, LV_OBJ_FLAG_HIDDEN);
+      } else {
+        if (wifi_disconnect_btn) lv_obj_add_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
+        if (wifi_network_list) lv_obj_clear_flag(wifi_network_list, LV_OBJ_FLAG_HIDDEN);
+        if (wifi_status_label) lv_label_set_text(wifi_status_label, "Scanning...");
+        
+        lv_obj_clean(wifi_network_list);
+        scanned_ssids.clear();
+        scanned_secured.clear();
+        wifiManager.requestScan();
+      }
       lv_obj_clear_flag(wifi_screen, LV_OBJ_FLAG_HIDDEN);
       break;
     }
@@ -540,6 +577,19 @@
       }
     }
 
+    // ── 1b. Artist name ────────────────────────────────────────────────────
+    String artistName = manager.getCurrentArtistName();
+    if (artistName != last_artist_name) {
+      last_artist_name = artistName;
+      if (artist_label != nullptr) {
+        if (artistName.length() == 0) {
+          lv_label_set_text(artist_label, "");
+        } else {
+          lv_label_set_text(artist_label, artistName.c_str());
+        }
+      }
+    }
+
     // ── 2. Playing state → status label + play/pause button symbol ────────
     bool playing = manager.isPlaying();
     if (playing != last_is_playing) {
@@ -632,7 +682,19 @@
       }
     }
 
-    // ── 7. Wi-Fi status label ──────────────────────────────────────────────
+    // ── 7. Update WiFi Status Icon on Now Playing screen ───────────────────
+    if (wifi_icon_label != nullptr) {
+      WifiState ws = wifiManager.getState();
+      if (ws == WifiState::WIFI_CONNECTED) {
+        lv_obj_remove_style(wifi_icon_label, &style_text_muted, 0);
+        lv_obj_add_style(wifi_icon_label, &style_text_accent, 0);
+      } else {
+        lv_obj_remove_style(wifi_icon_label, &style_text_accent, 0);
+        lv_obj_add_style(wifi_icon_label, &style_text_muted, 0);
+      }
+    }
+
+    // ── 8. Wi-Fi status label & scanner update ──────────────────────────────
     if (active_screen == PlayerScreen::WIFI && wifi_status_label != nullptr) {
       WifiState wifiState = wifiManager.getState();
 
@@ -640,30 +702,232 @@
       case WifiState::WIFI_CONNECTED: {
         String text = "Connected: " + wifiManager.getConnectedSsid();
         lv_label_set_text(wifi_status_label, text.c_str());
+        if (wifi_disconnect_btn) lv_obj_clear_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
+        if (wifi_network_list) lv_obj_add_flag(wifi_network_list, LV_OBJ_FLAG_HIDDEN);
         break;
       }
 
       case WifiState::WIFI_SCANNING:
         lv_label_set_text(wifi_status_label, "Scanning...");
+        if (wifi_disconnect_btn) lv_obj_add_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
         break;
 
       case WifiState::WIFI_CONNECTING:
         lv_label_set_text(wifi_status_label, "Connecting...");
+        if (wifi_disconnect_btn) lv_obj_add_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
         break;
 
       case WifiState::WIFI_FAILED:
         lv_label_set_text(wifi_status_label, "Connection failed");
+        if (wifi_disconnect_btn) lv_obj_add_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
+        if (wifi_failed_timer == 0) {
+          wifi_failed_timer = 3;
+        } else {
+          wifi_failed_timer--;
+          if (wifi_failed_timer == 0) {
+            wifiManager.requestScan();
+          }
+        }
         break;
 
       case WifiState::WIFI_IDLE:
-        lv_label_set_text(wifi_status_label, "Disconnected");
+        if (last_wifi_state == WifiState::WIFI_SCANNING) {
+          rebuildWifiList();
+        }
+        lv_label_set_text(wifi_status_label, "Select a network");
+        if (wifi_disconnect_btn) lv_obj_add_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
         break;
 
       case WifiState::WIFI_DISABLED:
       default:
         lv_label_set_text(wifi_status_label, "Wi-Fi unavailable");
+        if (wifi_disconnect_btn) lv_obj_add_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
         break;
       }
+      
+      last_wifi_state = wifiState;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  //  createWifiScreen()
+  // ─────────────────────────────────────────────────────────────────────────────
+  void PlayerUI::createWifiScreen() {
+    if (wifi_screen == nullptr) {
+      logPrintln("[PlayerUI] ERROR: WiFi parent is null.");
+      return;
+    }
+
+    // Title
+    lv_obj_t *title = lv_label_create(wifi_screen);
+    lv_label_set_text(title, "WIFI SETUP");
+    lv_obj_set_style_text_font(title, &lv_font_montserrat_16, 0);
+    lv_obj_add_style(title, &style_text_primary, 0);
+    lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 12);
+
+    // Back Button
+    lv_obj_t *backBtn = lv_btn_create(wifi_screen);
+    lv_obj_set_size(backBtn, 50, 32);
+    lv_obj_align(backBtn, LV_ALIGN_TOP_LEFT, 8, 8);
+    lv_obj_add_style(backBtn, &style_btn, 0);
+    lv_obj_add_event_cb(backBtn, back_to_player_cb, LV_EVENT_CLICKED, this);
+
+    lv_obj_t *backLabel = lv_label_create(backBtn);
+    lv_label_set_text(backLabel, LV_SYMBOL_LEFT);
+    lv_obj_center(backLabel);
+
+    // WiFi Status Label
+    wifi_status_label = lv_label_create(wifi_screen);
+    lv_label_set_text(wifi_status_label, "Disconnected");
+    lv_obj_set_style_text_font(wifi_status_label, &lv_font_montserrat_10, 0);
+    lv_obj_add_style(wifi_status_label, &style_text_muted, 0);
+    lv_obj_align(wifi_status_label, LV_ALIGN_TOP_MID, 0, 44);
+
+    // WiFi Disconnect Button
+    wifi_disconnect_btn = lv_btn_create(wifi_screen);
+    lv_obj_set_size(wifi_disconnect_btn, 100, 32);
+    lv_obj_align(wifi_disconnect_btn, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_style(wifi_disconnect_btn, &style_btn, 0);
+    lv_obj_add_event_cb(wifi_disconnect_btn, wifi_disconnect_cb, LV_EVENT_CLICKED, this);
+    lv_obj_add_flag(wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
+
+    lv_obj_t *discLabel = lv_label_create(wifi_disconnect_btn);
+    lv_label_set_text(discLabel, "Disconnect");
+    lv_obj_set_style_text_font(discLabel, &lv_font_montserrat_10, 0);
+    lv_obj_center(discLabel);
+
+    // Network List
+    wifi_network_list = lv_list_create(wifi_screen);
+    lv_obj_set_size(wifi_network_list, 224, 240);
+    lv_obj_align(wifi_network_list, LV_ALIGN_BOTTOM_MID, 0, -8);
+    lv_obj_set_style_bg_color(wifi_network_list, lv_color_hex(COLOR_HEX_BG), 0);
+    lv_obj_set_style_border_width(wifi_network_list, 0, 0);
+    lv_obj_set_style_pad_row(wifi_network_list, 4, 0);
+
+    // Password Text Area
+    wifi_password_area = lv_textarea_create(wifi_screen);
+    lv_obj_set_size(wifi_password_area, 224, 40);
+    lv_obj_align(wifi_password_area, LV_ALIGN_TOP_MID, 0, 70);
+    lv_textarea_set_password_mode(wifi_password_area, true);
+    lv_textarea_set_one_line(wifi_password_area, true);
+    lv_textarea_set_placeholder_text(wifi_password_area, "Enter password");
+    lv_obj_add_flag(wifi_password_area, LV_OBJ_FLAG_HIDDEN);
+
+    // Keyboard
+    wifi_keyboard = lv_keyboard_create(wifi_screen);
+    lv_obj_set_size(wifi_keyboard, 240, 180);
+    lv_obj_align(wifi_keyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
+    lv_obj_add_flag(wifi_keyboard, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_event_cb(wifi_keyboard, wifi_keyboard_cb, LV_EVENT_ALL, this);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  //  rebuildWifiList()
+  // ─────────────────────────────────────────────────────────────────────────────
+  void PlayerUI::rebuildWifiList() {
+    lv_obj_clean(wifi_network_list);
+    scanned_ssids.clear();
+    scanned_secured.clear();
+
+    std::vector<WifiNetwork> nets = wifiManager.getNetworks();
+    if (nets.empty()) {
+      lv_obj_t *row = lv_list_add_btn(wifi_network_list, nullptr, "No networks found. Tap to rescan.");
+      lv_obj_add_event_cb(row, [](lv_event_t *e) {
+        auto *ui = static_cast<PlayerUI *>(lv_event_get_user_data(e));
+        if (ui) {
+          ui->wifi_failed_timer = 0;
+          ui->wifiManager.requestScan();
+        }
+      }, LV_EVENT_CLICKED, this);
+      return;
+    }
+
+    int idx = 0;
+    for (const auto &net : nets) {
+      scanned_ssids.push_back(net.ssid);
+      scanned_secured.push_back(net.secured);
+
+      String rowText = net.ssid;
+      if (net.rssi != 0) {
+        rowText += " (" + String(net.rssi) + " dBm)";
+      }
+
+      lv_obj_t *row = lv_list_add_btn(wifi_network_list, net.secured ? LV_SYMBOL_KEYBOARD : nullptr, rowText.c_str());
+      lv_obj_set_user_data(row, reinterpret_cast<void *>(static_cast<intptr_t>(idx)));
+      lv_obj_add_event_cb(row, wifi_network_clicked_cb, LV_EVENT_CLICKED, this);
+      idx++;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  //  Callbacks
+  // ─────────────────────────────────────────────────────────────────────────────
+  void PlayerUI::wifi_network_clicked_cb(lv_event_t * e) {
+    auto *ui = static_cast<PlayerUI *>(lv_event_get_user_data(e));
+    if (!ui) return;
+
+    lv_obj_t *row = lv_event_get_target(e);
+    intptr_t index = reinterpret_cast<intptr_t>(lv_obj_get_user_data(row));
+
+    if (index >= 0 && index < (intptr_t)ui->scanned_ssids.size()) {
+      ui->selected_ssid = ui->scanned_ssids[index];
+      bool secured = ui->scanned_secured[index];
+
+      if (secured) {
+        lv_obj_clear_flag(ui->wifi_password_area, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(ui->wifi_keyboard, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui->wifi_network_list, LV_OBJ_FLAG_HIDDEN);
+        lv_textarea_set_text(ui->wifi_password_area, "");
+        lv_keyboard_set_textarea(ui->wifi_keyboard, ui->wifi_password_area);
+      } else {
+        ui->wifiManager.requestConnect(ui->selected_ssid, "");
+        if (ui->wifi_status_label) {
+          lv_label_set_text(ui->wifi_status_label, "Connecting...");
+        }
+      }
+    }
+  }
+
+  void PlayerUI::wifi_keyboard_cb(lv_event_t * e) {
+    auto *ui = static_cast<PlayerUI *>(lv_event_get_user_data(e));
+    if (!ui) return;
+
+    lv_event_code_t code = lv_event_get_code(e);
+    if (code == LV_EVENT_READY) {
+      const char *pwd = lv_textarea_get_text(ui->wifi_password_area);
+      ui->wifiManager.requestConnect(ui->selected_ssid, pwd);
+      
+      lv_obj_add_flag(ui->wifi_keyboard, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui->wifi_password_area, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui->wifi_network_list, LV_OBJ_FLAG_HIDDEN);
+      
+      if (ui->wifi_status_label) {
+        lv_label_set_text(ui->wifi_status_label, "Connecting...");
+      }
+    } else if (code == LV_EVENT_CANCEL) {
+      lv_obj_add_flag(ui->wifi_keyboard, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui->wifi_password_area, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui->wifi_network_list, LV_OBJ_FLAG_HIDDEN);
+    }
+  }
+
+  void PlayerUI::wifi_disconnect_cb(lv_event_t * e) {
+    auto *ui = static_cast<PlayerUI *>(lv_event_get_user_data(e));
+    if (ui) {
+      ui->wifiManager.requestDisconnect();
+      lv_obj_add_flag(ui->wifi_disconnect_btn, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui->wifi_network_list, LV_OBJ_FLAG_HIDDEN);
+      if (ui->wifi_status_label) {
+        lv_label_set_text(ui->wifi_status_label, "Disconnected");
+      }
+      ui->wifiManager.requestScan();
+    }
+  }
+
+  void PlayerUI::open_wifi_cb(lv_event_t * e) {
+    auto *ui = static_cast<PlayerUI *>(lv_event_get_user_data(e));
+    if (ui) {
+      ui->showScreen(PlayerScreen::WIFI);
     }
   }
 
